@@ -2,7 +2,7 @@ require '../lib/movie_data.rb'
 
 def load_file(file)
   print 'Loading default movie data into system...'
-  movie_data = MovieData.new file
+  movie_data = MovieData.new(:file => file)
   movie_data.load_data
   puts "Done\n\n"
 

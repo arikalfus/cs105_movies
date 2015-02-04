@@ -3,13 +3,17 @@
 # COSI 105B
 # (PA) Movies Part 1
 
+# noinspection RubyInstanceMethodNamingConvention
 class MovieData
 
-  # If no file is given, defaults to 'u.data' file in given folder
-  def initialize(folder, file='u.data')
-    @data = File.new "#{folder}/#{file}"
+  # If no test file is given, defaults to nil
+  def initialize(params)
+    @data = File.new "#{params[:file]}/u.data"
     @user_movie_map = Hash.new
     @movie_ratings_map = Hash.new
+
+    # If test_file is nil, set @test_file to nil. Else, set to training set file, removing : from symbol input.
+    params[:test_file].nil? ? @test_file = params[:test_file] : @test_file = File.new("#{params[:folder]}/#{params[:test_file]}.base")
   end
 
   def get_user_IDs
