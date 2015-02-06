@@ -19,26 +19,43 @@ class MovieData
     params.key?(:test_file) ? initialize_with_test(params) : initialize_defaults(params)
   end
 
+  # Get all user IDs in either training or test data.
   # #check_set decides which procedure to evaluate
   def get_user_IDs(set=:training)
     check_set set, proc { @training_data.get_user_IDs }, proc { @test_data.get_user_IDs }
   end
 
+  # # Get all movie IDs in either training or test data.
   # #check_set decides which procedure to evaluate
   def get_movie_IDs(set=:training)
     check_set set, proc { @training_data.get_movie_IDs }, proc { @test_data.get_movie_IDs }
   end
 
+  # Get all ratings of a certain movie in either training or test data.
   # Returned as array of hashes from user id => rating
   # #check_set decides which procedure to evaluate
   def get_all_ratings(movie_id, set=:training)
     check_set set, proc { @training_data.get_all_ratings(movie_id) }, proc { @test_data.get_all_ratings(movie_id) }
   end
 
+  # Find specific movie rating. If user did not rate movie, returns 0.
+  def rating(user_id, movie_id)
+
+    all_ratings = get_all_ratings movie_id
+    all_ratings[user_id] || 0
+
+  end
+
+  # Get all movies reviewed by a certain user in either training or test data.
   # Returned as array of movie IDs
   # #check_set decides which procedure to evaluate
-  def get__all_movies_reviewed(user_id, set=:training)
-    check_set set, proc { @training_data.get_all_movies_reviewed(user_id) }, proc { @test_data.get_all_movies_reviewed(user_id) }
+  def movies(user_id, set=:training)
+    check_set set, proc { @training_data.movies(user_id) }, proc { @test_data.movies(user_id) }
+  end
+
+  # Get all users who have reviewed a certain movie in either training or test data.
+  def viewers(movie_id, set=:training)
+    check_set set, proc { @training_data.viewers(movie_id) }, proc { @test_data.viewers(movie_id) }
   end
 
   # User reviews are stored as an array of movie id's per user id in a hash
@@ -113,8 +130,8 @@ class MovieData
     user1 = user1.to_s if user1.is_a? Fixnum
     user2 = user2.to_s if user2.is_a? Fixnum
 
-    user1_movies = get__all_movies_reviewed user1
-    user2_movies = get__all_movies_reviewed user2
+    user1_movies = movies user1
+    user2_movies = movies user2
     movies_in_common = user1_movies & user2_movies
 
     movies_in_common ? sim = compare_movies_seen(movies_in_common, user1, user2) : sim = 0
@@ -136,6 +153,11 @@ class MovieData
     
   end
 
+  # Returns estimate of what a user would rate a movie.
+  def predict(user_id, movie_id)
+    #TODO: Create prediction algorithm
+  end
+
   private # following methods are all private
 
   # If set is training set, initiate training set function. else, initiate test set function
@@ -145,9 +167,7 @@ class MovieData
 
   # If no test file is given, use default training set 'u.data'
   def initialize_defaults(params)
-
     @training_set = File.new "#{params[:folder]}/u.data"
-
   end
 
   # If test file is supplied, create training set and test set based on test file.
@@ -166,25 +186,17 @@ class MovieData
   # This similarity is defined as 5 points per movie, minus numerical difference
   # in ratings between each user's rating.
   #
-  # see #get_movie_rating
+  # see #rating
   def compare_movies_seen(movies, user1, user2)
 
     similarity = 0
     movies.each do |id|
-      user1_rating = get_movie_rating id, user1
-      user2_rating = get_movie_rating id, user2
+      user1_rating = rating user1, id
+      user2_rating = rating user2, id
 
       similarity += 5 - (user1_rating.to_i - user2_rating.to_i).abs
     end
     similarity
-
-  end
-
-  # Find specific movie rating.
-  def get_movie_rating(movie_id, user_id)
-
-    all_ratings = get_all_ratings movie_id
-    all_ratings[user_id]
 
   end
 

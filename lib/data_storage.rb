@@ -27,7 +27,7 @@ class DataStorage
   end
 
   # Returned as array of movie IDs
-  def get_all_movies_reviewed(user_id)
+  def movies(user_id)
     @user_movie_map[user_id]
   end
 
