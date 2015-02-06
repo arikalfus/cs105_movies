@@ -16,60 +16,32 @@ class MovieData
     params[:test_file].nil? ? initialize_defaults(params) : initialize_with_test(params)
   end
 
-  # If no test file is given, use default training set 'u.data'
-  def initialize_defaults(params)
-    @training_set = File.new "#{params[:folder]}/u.data"
-    @test_set = nil
-  end
-
-  # If test file is supplied, create training set and test set based on test file.
-  def initialize_with_test(params)
-    training_file_name = "#{params[:test_file]}.base"
-    test_file_name = "#{params[:test_file]}.test"
-
-    @training_set = File.new "#{params[:folder]}/#{training_file_name}"
-    @test_set = File.new "#{params[:folder]}/#{test_file_name}"
-  end
-
   def get_user_IDs(set='training')
-    set == 'training' ? @user_movie_map.keys : nil #TODO: replace nil with test set implementation
+    check_set set, @user_movie_map.keys, nil #TODO: replace nil with test set implementation
   end
 
   def get_movie_IDs(set='training')
-    set == 'training' ? @movie_ratings_map.keys : nil #TODO: replace nil with test set implementation
+    check_set set, @movie_ratings_map.keys, nil #TODO: replace nil with test set implementation
   end
 
   # Returned as array of hashes from user id => rating
-  def get_all_ratings(movie_id)
-    @movie_ratings_map[movie_id]
+  def get_all_ratings(movie_id, set='training')
+    check_set set, @movie_ratings_map[movie_id], nil #TODO: replace nil with test set implementation
   end
 
   # Returned as array of movie IDs
-  def get__all_movies_reviewed(user_id)
-    @user_movie_map[user_id]
+  def get__all_movies_reviewed(user_id, set='training')
+    check_set set, @user_movie_map[user_id], nil #TODO: replace nil with test set implementation
   end
 
   # User reviews are stored as an array of movie id's per user id in a hash
-  def add_user_review(user_id, movie_id)
-
-    # Create user_id entry if id does not already exist in hash.
-    @user_movie_map[user_id] = [] if @user_movie_map[user_id].nil?
-    # Add movie id to list of movies reviewed
-    @user_movie_map[user_id].push movie_id
-
+  def add_user_review(user_id, movie_id, set='training')
+    check_set set, add_training_user_review(user_id, movie_id), nil #TODO: replace nil with test set implementation
   end
 
   # Movie ratings are stored as a hash from user id => rating per movie id in a larger hash
-  def add_movie_rating(user_id, movie_id, rating)
-
-    # Create movie_id entry if id does not already exist in hash
-    @movie_ratings_map[movie_id] = Hash.new if @movie_ratings_map[movie_id].nil?
-
-    # Add rating to list of reviews
-    ratings = get_all_ratings movie_id
-    ratings[user_id] = rating
-    @movie_ratings_map[movie_id] = ratings
-
+  def add_movie_rating(user_id, movie_id, rating, set='training')
+    check_set set, add_training_movie_rating(user_id, movie_id, rating), nil #TODO: replace nil with test set implementation
   end
 
   # Creates review mappings from lines in a data file
@@ -140,6 +112,66 @@ class MovieData
 
   end
 
+  # Returns a list of users whose tastes are most similar to the tastes of u
+  def most_similar(u)
+
+    users = get_user_IDs - ["#{u}"] # remove user from list of user ID's to test
+    sim_of_users = []
+    # sort similarity list in descending order by similarity scores
+    users.each { |id| sim_of_users.push [similarity(u, id), id] }
+    sim_of_users.sort! { |a,b| b[0] <=> a[0] } # average nlogn, in place
+
+    sim_of_users
+    
+  end
+
+  private # following methods are all private
+
+  # If set is training set, initiate training set function. else, initiate test set function
+  def check_set(set, training_function, test_function)
+    set == 'training' ? training_function : test_function
+  end
+
+  # If no test file is given, use default training set 'u.data'
+  def initialize_defaults(params)
+
+    @training_set = File.new "#{params[:folder]}/u.data"
+    @test_set = nil
+
+  end
+
+  # If test file is supplied, create training set and test set based on test file.
+  def initialize_with_test(params)
+
+    training_file_name = "#{params[:test_file]}.base"
+    test_file_name = "#{params[:test_file]}.test"
+
+    @training_set = File.new "#{params[:folder]}/#{training_file_name}"
+    @test_set = File.new "#{params[:folder]}/#{test_file_name}"
+
+  end
+
+  def add_training_user_review(user_id, movie_id)
+
+    # Create user_id entry if id does not already exist in hash.
+    @user_movie_map[user_id] = [] if @user_movie_map[user_id].nil?
+    # Add movie id to list of movies reviewed
+    @user_movie_map[user_id].push movie_id
+
+  end
+
+  def add_training_movie_rating(user_id, movie_id, rating)
+
+    # Create movie_id entry if id does not already exist in hash
+    @movie_ratings_map[movie_id] = Hash.new if @movie_ratings_map[movie_id].nil?
+
+    # Add rating to list of reviews
+    ratings = get_all_ratings movie_id
+    ratings[user_id] = rating
+    @movie_ratings_map[movie_id] = ratings
+
+  end
+
   # Computes similarity between two users' movies in common.
   # This similarity is defined as 5 points per movie, minus numerical difference
   # in ratings between each user's rating.
@@ -160,24 +192,10 @@ class MovieData
 
   # Find specific movie rating.
   def get_movie_rating(movie_id, user_id)
+
     all_ratings = get_all_ratings movie_id
     all_ratings[user_id]
+
   end
-
-  # Returns a list of users whose tastes are most similar to the tastes of u
-  def most_similar(u)
-
-    users = get_user_IDs - ["#{u}"] # remove user from list of user ID's to test
-    sim_of_users = []
-    # sort similarity list in descending order by similarity scores
-    users.each { |id| sim_of_users.push [similarity(u, id), id] }
-    sim_of_users.sort! { |a,b| b[0] <=> a[0] } # average nlogn, in place
-
-    sim_of_users
-    
-  end
-
-  # List private methods
-  private :compare_movies_seen, :get_movie_rating, :initialize_defaults, :initialize_with_test
 
 end
