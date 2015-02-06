@@ -1,8 +1,8 @@
 require '../lib/movie_data.rb'
 
-def load_file(file)
+def load_file(folder)
   print 'Loading default movie data into system...'
-  movie_data = MovieData.new(:file => file)
+  movie_data = MovieData.new(:folder => folder)
   movie_data.load_data
   puts "Done\n\n"
 

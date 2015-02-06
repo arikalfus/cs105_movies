@@ -6,14 +6,28 @@
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
 
+  TRAINING_LINES = 80000
+  TEST_LINES = 20000
+
   # If no test file is given, defaults to nil
   def initialize(params)
-    @data = File.new "#{params[:file]}/u.data"
     @user_movie_map = Hash.new
     @movie_ratings_map = Hash.new
 
-    # If test_file is nil, set @test_file to nil. Else, set to training set file, removing : from symbol input.
-    params[:test_file].nil? ? @test_file = params[:test_file] : @test_file = File.new("#{params[:folder]}/#{params[:test_file]}.base")
+    params[:test_file].nil? ? initialize_defaults(params) : initialize_with_test(params)
+  end
+
+  def initialize_defaults(params)
+    @training_set = File.new "#{params[:folder]}/u.data"
+    @test_set = nil
+  end
+
+  def initialize_with_test(params)
+    training_file_name = "#{params[:test_file]}.base"
+    test_file_name = "#{params[:test_file]}.test"
+
+    @training_set = File.new "#{params[:folder]}/#{training_file_name}"
+    @test_set = File.new "#{params[:folder]}/#{test_file_name}"
   end
 
   def get_user_IDs
@@ -62,14 +76,14 @@ class MovieData
   # see #add_user_review and #add_movie_rating
   def load_data
 
-    @data.each_line do |line|
+    @training_set.each_line do |line|
       # data is stored in 4 chunks. [0] := user_id, [1] := movie_id, [2] := rating, [3] := timestamp
       # We ignore the timestamp
       review = line.chomp.split
       add_user_review(review[0], review[1])
       add_movie_rating(review[0], review[1], review[2])
     end
-    @data.close
+    @training_set.close
 
   end
 
@@ -163,6 +177,6 @@ class MovieData
   end
 
   # List private methods
-  private :compare_movies_seen, :get_movie_rating
+  private :compare_movies_seen, :get_movie_rating, :initialize_defaults, :initialize_with_test
 
 end
