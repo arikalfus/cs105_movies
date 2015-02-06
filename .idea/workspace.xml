@@ -9,7 +9,6 @@
   <component name="ChangeListManager">
     <list default="true" id="a92d04ea-4ae3-4da4-bd74-0067331c5bca" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/movie_data.rb" afterPath="$PROJECT_DIR$/lib/movie_data.rb" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="PA_Movies_Part_1.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,8 +35,8 @@
       <file leaf-file-name="movie_data.rb" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/movie_data.rb">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.14056225" vertical-offset="0" max-vertical-offset="3120">
-              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.85006696" vertical-offset="1735" max-vertical-offset="3225">
+              <caret line="156" column="4" selection-start-line="156" selection-start-column="4" selection-end-line="156" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -753,8 +752,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/movie_data.rb">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.14056225" vertical-offset="0" max-vertical-offset="3120">
-          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.85006696" vertical-offset="1735" max-vertical-offset="3225">
+          <caret line="156" column="4" selection-start-line="156" selection-start-column="4" selection-end-line="156" selection-end-column="4" />
           <folding />
         </state>
       </provider>

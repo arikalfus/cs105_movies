@@ -16,47 +16,48 @@ class MovieData
     params[:test_file].nil? ? initialize_defaults(params) : initialize_with_test(params)
   end
 
-  def get_user_IDs(set='training')
+  def get_user_IDs(set=:training)
     check_set set, @user_movie_map.keys, nil #TODO: replace nil with test set implementation
   end
 
-  def get_movie_IDs(set='training')
+  def get_movie_IDs(set=:training)
     check_set set, @movie_ratings_map.keys, nil #TODO: replace nil with test set implementation
   end
 
   # Returned as array of hashes from user id => rating
-  def get_all_ratings(movie_id, set='training')
+  def get_all_ratings(movie_id, set=:training)
     check_set set, @movie_ratings_map[movie_id], nil #TODO: replace nil with test set implementation
   end
 
   # Returned as array of movie IDs
-  def get__all_movies_reviewed(user_id, set='training')
+  def get__all_movies_reviewed(user_id, set=:training)
     check_set set, @user_movie_map[user_id], nil #TODO: replace nil with test set implementation
   end
 
   # User reviews are stored as an array of movie id's per user id in a hash
-  def add_user_review(user_id, movie_id, set='training')
+  def add_user_review(user_id, movie_id, set=:training)
     check_set set, add_training_user_review(user_id, movie_id), nil #TODO: replace nil with test set implementation
   end
 
   # Movie ratings are stored as a hash from user id => rating per movie id in a larger hash
-  def add_movie_rating(user_id, movie_id, rating, set='training')
+  def add_movie_rating(user_id, movie_id, rating, set=:training)
     check_set set, add_training_movie_rating(user_id, movie_id, rating), nil #TODO: replace nil with test set implementation
   end
 
   # Creates review mappings from lines in a data file
   #
   # see #add_user_review and #add_movie_rating
-  def load_data
+  def load_data(set_file=@training_set)
 
-    @training_set.each_line do |line|
+    set_file.each_line do |line|
       # data is stored in 4 chunks. [0] := user_id, [1] := movie_id, [2] := rating, [3] := timestamp
       # We ignore the timestamp
       review = line.chomp.split
-      add_user_review(review[0], review[1])
-      add_movie_rating(review[0], review[1], review[2])
+      set_file == @training_set ? set = :training : set = :test
+      add_user_review(review[0], review[1], set)
+      add_movie_rating(review[0], review[1], review[2], set)
     end
-    @training_set.close
+    set_file.close
 
   end
 
@@ -129,7 +130,7 @@ class MovieData
 
   # If set is training set, initiate training set function. else, initiate test set function
   def check_set(set, training_function, test_function)
-    set == 'training' ? training_function : test_function
+    set == :training ? training_function : test_function
   end
 
   # If no test file is given, use default training set 'u.data'
