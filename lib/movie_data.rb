@@ -6,9 +6,6 @@
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
 
-  TRAINING_LINES = 80000
-  TEST_LINES = 20000
-
   # If no test file is given, defaults to nil
   def initialize(params)
     @user_movie_map = Hash.new
