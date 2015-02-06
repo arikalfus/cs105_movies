@@ -1,23 +1,22 @@
 # author: Ari Kalfus
 # email: akalfus@brandeis.edu
 # COSI 105B
-# (PA) Movies Part 1
+# (PA) Movies Part 2
 
-require 'data'
+require_relative 'data_storage'
 
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
+
+  attr_accessor :training_data, :test_data
 
   # If no test file is given, use default initialization.
   #
   #see #initialize_defaults, #initialize_with_test
   def initialize(params)
-    #TODO: remove if code runs
-    # @user_movie_map = Hash.new
-    # @movie_ratings_map = Hash.new
-    @training_data = Data.new
+    @training_data = DataStorage.new
 
-    params[:test_file].nil? ? initialize_defaults(params) : initialize_with_test(params)
+    params.key?(:test_file) ? initialize_with_test(params) : initialize_defaults(params)
   end
 
   def get_user_IDs(set=:training)
@@ -40,12 +39,12 @@ class MovieData
 
   # User reviews are stored as an array of movie id's per user id in a hash
   def add_user_review(user_id, movie_id, set=:training)
-    check_set set, add_training_user_review(user_id, movie_id), nil #TODO: replace nil with test set implementation
+    check_set set, @training_data.add_user_review(user_id, movie_id), @test_data.add_user_review(user_id, movie_id)
   end
 
   # Movie ratings are stored as a hash from user id => rating per movie id in a larger hash
   def add_movie_rating(user_id, movie_id, rating, set=:training)
-    check_set set, add_training_movie_rating(user_id, movie_id, rating), nil #TODO: replace nil with test set implementation
+    check_set set, @training_data.add_movie_rating(user_id, movie_id, rating), @test_data.add_movie_rating(user_id, movie_id, rating)
   end
 
   # Creates review mappings from lines in a data file
@@ -153,28 +152,7 @@ class MovieData
 
     @training_set = File.new "#{params[:folder]}/#{training_file_name}"
     @test_set = File.new "#{params[:folder]}/#{test_file_name}"
-    @test_data = Data.new
-
-  end
-
-  def add_training_user_review(user_id, movie_id)
-
-    # Create user_id entry if id does not already exist in hash.
-    @user_movie_map[user_id] = [] if @user_movie_map[user_id].nil?
-    # Add movie id to list of movies reviewed
-    @user_movie_map[user_id].push movie_id
-
-  end
-
-  def add_training_movie_rating(user_id, movie_id, rating)
-
-    # Create movie_id entry if id does not already exist in hash
-    @movie_ratings_map[movie_id] = Hash.new if @movie_ratings_map[movie_id].nil?
-
-    # Add rating to list of reviews
-    ratings = get_all_ratings movie_id
-    ratings[user_id] = rating
-    @movie_ratings_map[movie_id] = ratings
+    @test_data = DataStorage.new
 
   end
 
