@@ -8,7 +8,7 @@ require_relative 'data_storage'
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
 
-  attr_accessor :training_data, :test_data
+  attr_reader :training_data, :test_data #TODO: For testing purposes only. Remove during final refactor.
 
   # If no test file is given, use default initialization.
   #
@@ -19,32 +19,38 @@ class MovieData
     params.key?(:test_file) ? initialize_with_test(params) : initialize_defaults(params)
   end
 
+  # #check_set decides which procedure to evaluate
   def get_user_IDs(set=:training)
-    check_set set, @training_data.get_user_IDs, @test_data.get_user_IDs
+    check_set set, proc { @training_data.get_user_IDs }, proc { @test_data.get_user_IDs }
   end
 
+  # #check_set decides which procedure to evaluate
   def get_movie_IDs(set=:training)
-    check_set set, @training_data.get_movie_IDs, @test_data.get_movie_IDs
+    check_set set, proc { @training_data.get_movie_IDs }, proc { @test_data.get_movie_IDs }
   end
 
   # Returned as array of hashes from user id => rating
+  # #check_set decides which procedure to evaluate
   def get_all_ratings(movie_id, set=:training)
-    check_set set, @training_data.get_all_ratings(movie_id), @test_data.get_all_ratings(movie_id)
+    check_set set, proc { @training_data.get_all_ratings(movie_id) }, proc { @test_data.get_all_ratings(movie_id) }
   end
 
   # Returned as array of movie IDs
+  # #check_set decides which procedure to evaluate
   def get__all_movies_reviewed(user_id, set=:training)
-    check_set set, @training_data.get_all_movies_reviewed(user_id), @test_data.get_all_movies_reviewed(user_id)
+    check_set set, proc { @training_data.get_all_movies_reviewed(user_id) }, proc { @test_data.get_all_movies_reviewed(user_id) }
   end
 
   # User reviews are stored as an array of movie id's per user id in a hash
+  # #check_set decides which procedure to evaluate
   def add_user_review(user_id, movie_id, set=:training)
-    check_set set, @training_data.add_user_review(user_id, movie_id), @test_data.add_user_review(user_id, movie_id)
+    check_set set, proc { @training_data.add_user_review(user_id, movie_id) }, proc { @test_data.add_user_review(user_id, movie_id) }
   end
 
   # Movie ratings are stored as a hash from user id => rating per movie id in a larger hash
+  # #check_set decides which procedure to evaluate
   def add_movie_rating(user_id, movie_id, rating, set=:training)
-    check_set set, @training_data.add_movie_rating(user_id, movie_id, rating), @test_data.add_movie_rating(user_id, movie_id, rating)
+    check_set set, proc { @training_data.add_movie_rating(user_id, movie_id, rating) }, proc { @test_data.add_movie_rating(user_id, movie_id, rating) }
   end
 
   # Creates review mappings from lines in a data file
@@ -134,7 +140,7 @@ class MovieData
 
   # If set is training set, initiate training set function. else, initiate test set function
   def check_set(set, training_method, test_method)
-    set == :training ? training_method : test_method
+    set == :training ? training_method.call : test_method.call
   end
 
   # If no test file is given, use default training set 'u.data'
