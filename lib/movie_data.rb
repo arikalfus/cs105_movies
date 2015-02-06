@@ -3,6 +3,8 @@
 # COSI 105B
 # (PA) Movies Part 1
 
+require 'data'
+
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
 
@@ -10,28 +12,30 @@ class MovieData
   #
   #see #initialize_defaults, #initialize_with_test
   def initialize(params)
-    @user_movie_map = Hash.new
-    @movie_ratings_map = Hash.new
+    #TODO: remove if code runs
+    # @user_movie_map = Hash.new
+    # @movie_ratings_map = Hash.new
+    @training_data = Data.new
 
     params[:test_file].nil? ? initialize_defaults(params) : initialize_with_test(params)
   end
 
   def get_user_IDs(set=:training)
-    check_set set, @user_movie_map.keys, nil #TODO: replace nil with test set implementation
+    check_set set, @training_data.get_user_IDs, @test_data.get_user_IDs
   end
 
   def get_movie_IDs(set=:training)
-    check_set set, @movie_ratings_map.keys, nil #TODO: replace nil with test set implementation
+    check_set set, @training_data.get_movie_IDs, @test_data.get_movie_IDs
   end
 
   # Returned as array of hashes from user id => rating
   def get_all_ratings(movie_id, set=:training)
-    check_set set, @movie_ratings_map[movie_id], nil #TODO: replace nil with test set implementation
+    check_set set, @training_data.get_all_ratings(movie_id), @test_data.get_all_ratings(movie_id)
   end
 
   # Returned as array of movie IDs
   def get__all_movies_reviewed(user_id, set=:training)
-    check_set set, @user_movie_map[user_id], nil #TODO: replace nil with test set implementation
+    check_set set, @training_data.get_all_movies_reviewed(user_id), @test_data.get_all_movies_reviewed(user_id)
   end
 
   # User reviews are stored as an array of movie id's per user id in a hash
@@ -54,6 +58,7 @@ class MovieData
       # We ignore the timestamp
       review = line.chomp.split
       set_file == @training_set ? set = :training : set = :test
+
       add_user_review(review[0], review[1], set)
       add_movie_rating(review[0], review[1], review[2], set)
     end
@@ -129,15 +134,14 @@ class MovieData
   private # following methods are all private
 
   # If set is training set, initiate training set function. else, initiate test set function
-  def check_set(set, training_function, test_function)
-    set == :training ? training_function : test_function
+  def check_set(set, training_method, test_method)
+    set == :training ? training_method : test_method
   end
 
   # If no test file is given, use default training set 'u.data'
   def initialize_defaults(params)
 
     @training_set = File.new "#{params[:folder]}/u.data"
-    @test_set = nil
 
   end
 
@@ -149,6 +153,7 @@ class MovieData
 
     @training_set = File.new "#{params[:folder]}/#{training_file_name}"
     @test_set = File.new "#{params[:folder]}/#{test_file_name}"
+    @test_data = Data.new
 
   end
 
