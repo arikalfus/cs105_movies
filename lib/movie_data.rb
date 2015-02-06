@@ -6,7 +6,9 @@
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
 
-  # If no test file is given, defaults to nil
+  # If no test file is given, use default initialization.
+  #
+  #see #initialize_defaults, #initialize_with_test
   def initialize(params)
     @user_movie_map = Hash.new
     @movie_ratings_map = Hash.new
@@ -14,11 +16,13 @@ class MovieData
     params[:test_file].nil? ? initialize_defaults(params) : initialize_with_test(params)
   end
 
+  # If no test file is given, use default training set 'u.data'
   def initialize_defaults(params)
     @training_set = File.new "#{params[:folder]}/u.data"
     @test_set = nil
   end
 
+  # If test file is supplied, create training set and test set based on test file.
   def initialize_with_test(params)
     training_file_name = "#{params[:test_file]}.base"
     test_file_name = "#{params[:test_file]}.test"
@@ -27,12 +31,12 @@ class MovieData
     @test_set = File.new "#{params[:folder]}/#{test_file_name}"
   end
 
-  def get_user_IDs
-    @user_movie_map.keys
+  def get_user_IDs(set='training')
+    set == 'training' ? @user_movie_map.keys : nil #TODO: replace nil with test set implementation
   end
 
-  def get_movie_IDs
-    @movie_ratings_map.keys
+  def get_movie_IDs(set='training')
+    set == 'training' ? @movie_ratings_map.keys : nil #TODO: replace nil with test set implementation
   end
 
   # Returned as array of hashes from user id => rating
