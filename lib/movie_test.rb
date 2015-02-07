@@ -52,6 +52,8 @@ class MovieTest
       results.push %W(result[:user_id] result[:movie_id] result[:rating] result[:prediction])
     end
 
+    results
+
   end
 
 

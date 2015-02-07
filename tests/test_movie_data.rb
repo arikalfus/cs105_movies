@@ -3,49 +3,46 @@ require 'test/unit'
 
 class TestMovie < Test::Unit::TestCase
 
-  # def test_data_storage
-   #  movie_data = MovieData.new folder: './data/ml-100k'
-   #  assert_not_nil movie_data.training_data, 'Training Data is nil!'
-   #  assert_equal nil, movie_data.test_data, 'Test Data is not nil!'
-  #
-   #  puts "Training data: #{movie_data.training_data}"
-   #  puts "Test data: #{movie_data.test_data}"
-  # end
-  #
-	# def test_load_data
-	# 	movie_data = MovieData.new folder: './data/ml-100k'
-	# 	movie_data.load_data
-	# 	assert_not_nil(movie_data.get_user_IDs)
-	# 	assert_not_nil(movie_data.get_movie_IDs)
-	# end
-  #
-	# def test_popularity
-	# 	movie_data = MovieData.new folder: './data/ml-100k'
-	# 	movie_data.load_data
-	# 	movies = movie_data.get_movie_IDs
-	# 	movies.each do |movie|
-	# 		pop = movie_data.popularity movie
-	# 		assert_not_nil pop
-	# 	end
-	# end
-  #
-	# def test_popularity_list
-	# 	movie_data = MovieData.new folder: './data/ml-100k'
-	# 	movie_data.load_data
-	# 	pop_list =  movie_data.popularity_list
-	# 	assert_not_nil pop_list
-	# end
-  #
-	# def test_similarity
-	# 	movie_data = MovieData.new folder: './data/ml-100k'
-	# 	movie_data.load_data
-	# 	users = movie_data.get_user_IDs
-	# 	user1 = users[rand users.size]
-	# 	user2 = users[rand users.size]
-  #
-	# 	sim = movie_data.similarity user1, user2
-	# 	assert_not_equal 0, sim
-	# end
+  def test_data_storage
+   movie_data = MovieData.new folder: './data/ml-100k'
+   assert_not_nil movie_data.training_data, 'Training Data is nil!'
+   assert_equal nil, movie_data.test_data, 'Test Data is not nil!'
+  end
+
+	def test_load_data
+		movie_data = MovieData.new folder: './data/ml-100k'
+		movie_data.load_data
+		assert_not_nil movie_data.get_user_IDs, "User ID's are nil!"
+		assert_not_nil movie_data.get_movie_IDs, "Movie ID's are nil!"
+	end
+
+	def test_popularity
+		movie_data = MovieData.new folder: './data/ml-100k'
+		movie_data.load_data
+		movies = movie_data.get_movie_IDs
+		movies.each do |movie|
+			pop = movie_data.popularity movie
+			assert_not_nil pop, "#{movie}'s popularity is nil!"
+		end
+	end
+
+	def test_popularity_list
+		movie_data = MovieData.new folder: './data/ml-100k'
+		movie_data.load_data
+		pop_list =  movie_data.popularity_list
+		assert_not_nil pop_list, 'Popularity list is nil!'
+	end
+
+	def test_similarity
+		movie_data = MovieData.new folder: './data/ml-100k'
+		movie_data.load_data
+		users = movie_data.get_user_IDs
+		user1 = users[rand users.size]
+		user2 = users[rand users.size]
+
+		sim = movie_data.similarity user1, user2
+		assert_not_equal 0, sim, 'Similarity is 0! This does happen occasionally. Please rerun the rake test.'
+	end
 
 	# def test_total_sim
 	# 	movie_data = MovieData.new folder: './data/ml-100k'
