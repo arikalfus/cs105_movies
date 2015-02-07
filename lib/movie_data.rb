@@ -4,6 +4,7 @@
 # (PA) Movies Part 2
 
 require_relative 'data_storage'
+require_relative 'movie_test'
 
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
@@ -42,7 +43,7 @@ class MovieData
   def rating(user_id, movie_id)
 
     all_ratings = get_all_ratings movie_id
-    all_ratings[user_id] || 0
+    all_ratings[user_id].to_i || 0
 
   end
 
@@ -73,13 +74,13 @@ class MovieData
   # Creates review mappings from lines in a data file
   #
   # see #add_user_review and #add_movie_rating
-  def load_data(set_file=@training_set)
+  def load_data(set_file=@training_file)
 
     set_file.each_line do |line|
       # data is stored in 4 chunks. [0] := user_id, [1] := movie_id, [2] := rating, [3] := timestamp
       # We ignore the timestamp
       review = line.chomp.split
-      set_file == @training_set ? set = :training : set = :test
+      set_file == @training_file ? set = :training : set = :test
 
       add_user_review(review[0], review[1], set)
       add_movie_rating(review[0], review[1], review[2], set)
@@ -153,35 +154,6 @@ class MovieData
     
   end
 
-  # Returns estimate of what a user would rate a movie.
-  def predict(user_id, movie_id)
-    #TODO: Create prediction algorithm
-  end
-
-  private # following methods are all private
-
-  # If set is training set, initiate training set function. else, initiate test set function
-  def check_set(set, training_method, test_method)
-    set == :training ? training_method.call : test_method.call
-  end
-
-  # If no test file is given, use default training set 'u.data'
-  def initialize_defaults(params)
-    @training_set = File.new "#{params[:folder]}/u.data"
-  end
-
-  # If test file is supplied, create training set and test set based on test file.
-  def initialize_with_test(params)
-
-    training_file_name = "#{params[:test_file]}.base"
-    test_file_name = "#{params[:test_file]}.test"
-
-    @training_set = File.new "#{params[:folder]}/#{training_file_name}"
-    @test_set = File.new "#{params[:folder]}/#{test_file_name}"
-    @test_data = DataStorage.new
-
-  end
-
   # Computes similarity between two users' movies in common.
   # This similarity is defined as 5 points per movie, minus numerical difference
   # in ratings between each user's rating.
@@ -194,9 +166,59 @@ class MovieData
       user1_rating = rating user1, id
       user2_rating = rating user2, id
 
-      similarity += 5 - (user1_rating.to_i - user2_rating.to_i).abs
+      similarity += 5 - (user1_rating - user2_rating).abs
     end
     similarity
+
+  end
+
+  # Returns estimate of what a user would rate a movie between 1.0 and 5.0.
+  def predict(user_id, movie_id)
+
+    #TODO: Create prediction algorithm
+
+  end
+
+  def run_test(k=@test_file.count)
+
+    raise ArgumentError, 'Test Data does not exist.' unless instance_variable_defined? :@test_file
+
+    lines_to_test = @test_file.first k
+    results = []
+    lines_to_test.each do |line|
+      # [0] := user_id, [1] := movie_id, [2] := rating, [3] := timestamp
+      line = line.chomp.split
+      user_id, movie_id = line[0], line[1]
+
+      results.push({ :user_id => user_id, :movie_id => movie_id, :rating => rating(user_id, movie_id), :prediction => predict(user_id, movie_id) })
+    end
+
+    MovieTest.new results
+
+  end
+
+
+  private
+
+  # If set is training set, initiate training set function. else, initiate test set function
+  def check_set(set, training_method, test_method)
+    set == :training ? training_method.call : test_method.call
+  end
+
+  # If no test file is given, use default training set 'u.data'
+  def initialize_defaults(params)
+    @training_file = File.new "#{params[:folder]}/u.data"
+  end
+
+  # If test file is supplied, create training set and test set based on test file.
+  def initialize_with_test(params)
+
+    training_file_name = "#{params[:test_file]}.base"
+    test_file_name = "#{params[:test_file]}.test"
+
+    @training_file = File.new "#{params[:folder]}/#{training_file_name}"
+    @test_file = File.new "#{params[:folder]}/#{test_file_name}"
+    @test_data = DataStorage.new
 
   end
 
