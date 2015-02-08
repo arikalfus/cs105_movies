@@ -261,19 +261,25 @@ class MovieData
     similar_array = most_similar user_id
 
     similar_users = []
-    similar_array.first(similar_array.size * 0.70).each { |_, user| similar_users.push user }
+    similar_array.first(similar_array.size * 0.25).each { |_, user| similar_users.push user }
 
     similar_users
 
   end
 
+  # Calculates a prediction value based on average rating from similar users.
   def calc_prediction(ratings_from_sample)
 
     best_estimate = {0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0 }
     ratings_from_sample.each { |rating| best_estimate[rating] += 1 }
 
-    # Returns key corresponding to the largest value
-    best_estimate.max_by { |_, val| val }[0].to_f
+    sum_of_ratings = 0.0
+    ratings_from_sample.each { |rating| sum_of_ratings += rating }
+
+    sum_of_ratings / ratings_from_sample.size
+
+    # # Returns key corresponding to the largest value
+    # best_estimate.max_by { |_, val| val }[0].to_f
 
   end
 
