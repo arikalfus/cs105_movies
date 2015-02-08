@@ -3,7 +3,8 @@
 # COSI 105B
 # (PA) Movies Part 2
 
-# Class stores movie data.
+# Class loads and stores movie data.
+# noinspection RubyInstanceMethodNamingConvention
 class DataStorage
 
   attr_reader :user_movie_map, :movie_ratings_map
@@ -14,31 +15,31 @@ class DataStorage
   end
 
   def get_user_IDs
-    raise_exception'user IDs', @user_movie_map.keys.nil?
-    @user_movie_map.keys
+    ids = @user_movie_map.keys
+    verify_results ids
   end
 
   def get_movie_IDs
-    raise_exception 'movie IDs', @movie_ratings_map.keys.nil?
-    @movie_ratings_map.keys
+    ids = @movie_ratings_map.keys
+    verify_results ids
   end
 
-  # Returned as array of hashes from user id => rating
+  # Returned as Hash of hashes from user id => rating
   def get_all_ratings(movie_id)
-    raise_argument_exception 'movie_id', @movie_ratings_map[movie_id]
-    @movie_ratings_map[movie_id]
+    ratings = @movie_ratings_map[movie_id]
+    ratings.nil? ? Hash.new : ratings
   end
 
   # Returned as array of movie IDs
   def movies(user_id)
-    raise_argument_exception 'user id', @user_movie_map[user_id]
-    @user_movie_map[user_id]
+    movies = @user_movie_map[user_id]
+    verify_results movies
   end
 
   # Get all users who have reviewed a certain movie
   def viewers(movie_id)
-    raise_argument_exception 'movie_id', get_all_ratings(movie_id).keys
-    get_all_ratings(movie_id).keys
+    ratings = get_all_ratings(movie_id)
+    verify_results ratings, ratings.keys
   end
 
   # User reviews are stored as an array of movie id's per user id in a hash
@@ -64,6 +65,9 @@ class DataStorage
 
   end
 
+  # Creates review mappings from lines in a data file.
+  #
+  # see #add_user_review and #add_movie_rating
   def load_data(file)
 
     file.each_line do |line|
@@ -74,18 +78,18 @@ class DataStorage
       add_user_review review[0], review[1]
       add_movie_rating review[0], review[1], review[2]
     end
-    file.close
 
   end
 
   private
 
-  def raise_exception(item, procedure)
-    raise "There are no #{item}! Please load data with the load data method." if procedure.nil?
+  def evaluate_nil?(element, nil_return, else_return)
+    element.nil? ? nil_return : else_return
   end
 
-  def raise_argument_exception(parameter, procedure)
-    raise ArgumentError, "Parameter #{parameter} did not return a valid value." if procedure.nil?
+  # Ensures IDs are not nil.
+  def verify_results(result, to_return=result)
+    evaluate_nil? result, ['0'], to_return
   end
 
 end

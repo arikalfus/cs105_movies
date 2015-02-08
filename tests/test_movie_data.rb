@@ -3,12 +3,6 @@ require 'test/unit'
 
 class TestMovie < Test::Unit::TestCase
 
-  def test_data_storage
-   movie_data = MovieData.new folder: './data/ml-100k'
-   assert_not_nil movie_data.training_data, 'Training Data is nil!'
-   assert_equal nil, movie_data.test_data, 'Test Data is not nil!'
-  end
-
 	def test_load_data
 		movie_data = MovieData.new folder: './data/ml-100k'
 		movie_data.load_data
@@ -66,11 +60,11 @@ class TestMovie < Test::Unit::TestCase
 	# end
 
   def test_prediction
+
     movie_data = MovieData.new(:folder => './data/ml-100k',
                                :test => :u1)
 
     movie_data.load_data
-    movie_data.load_data(:test)
     users = movie_data.get_user_IDs
     test_users = movie_data.get_user_IDs(:test)
     movies = movie_data.get_movie_IDs
@@ -82,6 +76,18 @@ class TestMovie < Test::Unit::TestCase
     prediction = movie_data.predict rand(sample_users.size).to_s, rand(sample_movies.size).to_s
 
     puts "prediction: #{prediction}"
+
+  end
+
+  def test_run_test
+
+    movie_data = MovieData.new(:folder => './data/ml-100k',
+                               :test => :u1)
+
+    movie_data.load_data
+    movie_test = movie_data.run_test
+    puts "Movie Test results: #{movie_test.to_a}"
+    puts "Statistics:\n#{movie_test.compute_stats}"
 
   end
 	

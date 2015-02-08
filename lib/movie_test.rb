@@ -7,8 +7,6 @@ require 'set'
 
 class MovieTest
 
-  attr_reader :errors
-
   # params is an array of hashes, each made up of :user_id, :movie_id, :rating, and :prediction
   def initialize(params)
     @data = params
@@ -49,11 +47,19 @@ class MovieTest
 
     results = []
     @data.each do |result|
-      results.push %W(result[:user_id] result[:movie_id] result[:rating] result[:prediction])
+      results.push %W(#{result[:user_id]} #{result[:movie_id]} #{result[:rating]} #{result[:prediction]})
     end
 
     results
 
+  end
+
+  def compute_stats
+    %Q(
+    Mean: #{mean}
+    RMS: #{rms}
+    Standard deviation: #{stddev}
+    )
   end
 
 
