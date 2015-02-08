@@ -64,5 +64,25 @@ class TestMovie < Test::Unit::TestCase
 	# 		puts "#{i += 1}. Popularity: #{sim_array[0]}, user ID: #{sim_array[1]}"
 	# 	end
 	# end
+
+  def test_prediction
+    movie_data = MovieData.new(:folder => './data/ml-100k',
+                               :test => :u1)
+
+    movie_data.load_data
+    movie_data.load_data(:test)
+    users = movie_data.get_user_IDs
+    test_users = movie_data.get_user_IDs(:test)
+    movies = movie_data.get_movie_IDs
+    test_movies = movie_data.get_movie_IDs(:test)
+
+    sample_users = users & test_users
+    sample_movies = movies & test_movies
+
+    prediction = movie_data.predict rand(sample_users.size).to_s, rand(sample_movies.size).to_s
+
+    puts "prediction: #{prediction}"
+
+  end
 	
 end
