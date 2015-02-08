@@ -276,7 +276,7 @@ class MovieData
   end
 
   def sample_warning(user_id, movie_id)
-    puts "\nWarning! User sample size for user #{user_id} and movie #{movie_id} is below 5. Prediction is not guaranteed to have high reliability.\n"
+    puts "\nWarning! User sample size for user #{user_id} and movie #{movie_id} is not large enough to compute an accurate prediction (sample size < 5). Prediction is not guaranteed to have high reliability.\n"
   end
 
 end

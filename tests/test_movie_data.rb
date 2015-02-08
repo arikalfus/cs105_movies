@@ -85,7 +85,7 @@ class TestMovie < Test::Unit::TestCase
                                :test => :u1)
 
     movie_data.load_data
-    movie_test = movie_data.run_test
+    movie_test = movie_data.run_test 20
     puts "Movie Test results: #{movie_test.to_a}"
     puts "Statistics:\n#{movie_test.compute_stats}"
 
