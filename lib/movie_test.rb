@@ -22,6 +22,7 @@ class MovieTest
 
   end
 
+  # Returns standard deviation of error
   def stddev
     Math.sqrt variance
   end
@@ -30,10 +31,11 @@ class MovieTest
   def rms
     total = @errors.inject { |acc, er| acc + er**2 }
 
-    Math.sqrt total.to_f / @errors.size
+    Math.sqrt(total.to_f / @errors.size)
 
   end
 
+  # Returns variance of error
   def variance
 
     mean_of_errors = mean

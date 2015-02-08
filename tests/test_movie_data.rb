@@ -87,6 +87,7 @@ class TestMovie < Test::Unit::TestCase
     movie_data.load_data
     movie_test = movie_data.run_test 100
 
+    puts "Stats:\n#{movie_test.compute_stats}"
     assert movie_test.mean < 1.0
 
   end

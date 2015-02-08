@@ -9,6 +9,12 @@ require_relative 'movie_test'
 # noinspection RubyInstanceMethodNamingConvention
 class MovieData
 
+  # Class variables for file reading
+  UID = 0
+  MID = 1
+  RAT = 2
+  TIM = 3
+
   # If no test file is given, use default initialization.
   #
   #see #initialize_defaults, #initialize_with_test
@@ -167,10 +173,11 @@ class MovieData
 
     lines_to_test = @test_file.first k
     results = []
+    # Less operational cost than grabbing the data from @test_data
     lines_to_test.each do |line|
       # [0] := user_id, [1] := movie_id, [2] := rating, [3] := timestamp
       line = line.chomp.split
-      user_id, movie_id, rating = line[0], line[1], line[2]
+      user_id, movie_id, rating = line[UID], line[MID], line[RAT]
 
       results.push({ :user_id => user_id,
                      :movie_id => movie_id,
@@ -255,7 +262,8 @@ class MovieData
   end
 
   # Returns a segment of the most similar users.
-  # Segment is currently defined as top 70% of similar users, as this was found to be more accurate than a smaller proportion.
+  # Segment is currently defined as top 25% of similar users, as this was found to be a good balance
+  # between restricting test to high-similarity users and size of user sample.
   def grab_top_similar_users(user_id)
 
     similar_array = most_similar user_id
@@ -270,16 +278,10 @@ class MovieData
   # Calculates a prediction value based on average rating from similar users.
   def calc_prediction(ratings_from_sample)
 
-    best_estimate = {0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0 }
-    ratings_from_sample.each { |rating| best_estimate[rating] += 1 }
-
     sum_of_ratings = 0.0
     ratings_from_sample.each { |rating| sum_of_ratings += rating }
 
     sum_of_ratings / ratings_from_sample.size
-
-    # # Returns key corresponding to the largest value
-    # best_estimate.max_by { |_, val| val }[0].to_f
 
   end
 
