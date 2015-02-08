@@ -160,10 +160,7 @@ class MovieData
   # Estimation is calculated based on the rating similar users gave this movie.
   def predict(user_id, movie_id)
 
-    similar_array = most_similar user_id
-    similar_users = similar_array.collect { |_, user| user }
-    users_seen_movie = viewers movie_id
-    user_sample = similar_users & users_seen_movie
+    user_sample = build_user_sample user_id, movie_id
 
     relevant_ratings = relevant_ratings movie_id, user_sample
     ratings_from_sample = Set.new
@@ -224,6 +221,16 @@ class MovieData
     symbol == :test ? @test_file : @training_file
   end
 
+  # Returns an array of user IDs who are similar to user user_id and have seen movie movie_id
+  def build_user_sample(user_id, movie_id)
+
+    users_seen_movie = viewers movie_id
+    similar_users = grab_top_similar_users user_id
+
+    similar_users & users_seen_movie
+
+  end
+
   # Returns a 2D array containing [user_id. rating] of all the user IDs in the user pool
   def relevant_ratings(movie_id, user_pool)
 
@@ -232,6 +239,18 @@ class MovieData
     ratings.each { |user, rating| relevant_ratings.push user => rating if user_pool.include? user }
 
     relevant_ratings
+
+  end
+
+  #TODO: needs work
+  def grab_top_similar_users(user_id)
+
+    similar_array = most_similar user_id
+
+    similar_users = []
+    similar_array.first(5).each { |_, user| similar_users.push user }
+
+    similar_users
 
   end
 
