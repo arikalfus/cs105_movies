@@ -171,6 +171,8 @@ class MovieData
     raise ArgumentError, 'Test Data does not exist.' unless instance_variable_defined? :@test_file
     @test_file.rewind if instance_variable_defined? :@test_file # rewind file after counting it in default parameter
 
+    start_time = Time.now
+
     lines_to_test = @test_file.first k
     results = []
     # Less operational cost than grabbing the data from @test_data
@@ -185,6 +187,8 @@ class MovieData
                      :prediction => predict(user_id, movie_id)
                    })
     end
+
+    puts "Time to run algorithm for #{k} tests: #{Time.now - start_time}"
 
     MovieTest.new results
 
