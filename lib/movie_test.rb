@@ -47,7 +47,7 @@ class MovieTest
 
     results = []
     @data.each do |result|
-      results.push %W(#{result[:user_id]} #{result[:movie_id]} #{result[:rating]} #{result[:prediction]})
+      results.push %W(#{result[:user_id]} #{result[:movie_id]} #{result[:rating].to_f} #{result[:prediction].to_f})
     end
 
     results

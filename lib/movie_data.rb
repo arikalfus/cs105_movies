@@ -168,13 +168,10 @@ class MovieData
 
   end
 
-  def run_test(k=nil)
+  def run_test(k=@test_file.count)
 
     raise ArgumentError, 'Test Data does not exist.' unless instance_variable_defined? :@test_file
-
-    @test_file.rewind if instance_variable_defined? :@test_file
-    k = @test_file.count if instance_variable_defined? :@test_file
-    @test_file.rewind if instance_variable_defined? :@test_file
+    @test_file.rewind if instance_variable_defined? :@test_file # rewind file after counting it in default parameter
 
     lines_to_test = @test_file.first k
     results = []
@@ -186,7 +183,8 @@ class MovieData
       results.push({ :user_id => user_id,
                      :movie_id => movie_id,
                      :rating => rating(user_id, movie_id),
-                     :prediction => predict(user_id, movie_id) })
+                     :prediction => predict(user_id, movie_id)
+                   })
     end
 
     MovieTest.new results

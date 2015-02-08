@@ -16,30 +16,30 @@ class DataStorage
 
   def get_user_IDs
     ids = @user_movie_map.keys
-    verify_results ids
+    verify_ID_results ids
   end
 
   def get_movie_IDs
     ids = @movie_ratings_map.keys
-    verify_results ids
+    verify_ID_results ids
   end
 
   # Returned as Hash of hashes from user id => rating
   def get_all_ratings(movie_id)
     ratings = @movie_ratings_map[movie_id]
-    ratings.nil? ? Hash.new : ratings
+    execute_if_nil? ratings, Hash.new, ratings
   end
 
   # Returned as array of movie IDs
   def movies(user_id)
     movies = @user_movie_map[user_id]
-    verify_results movies
+    verify_ID_results movies
   end
 
   # Get all users who have reviewed a certain movie
   def viewers(movie_id)
     ratings = get_all_ratings(movie_id)
-    verify_results ratings, ratings.keys
+    verify_ID_results ratings, ratings.keys
   end
 
   # User reviews are stored as an array of movie id's per user id in a hash
@@ -78,18 +78,21 @@ class DataStorage
       add_user_review review[0], review[1]
       add_movie_rating review[0], review[1], review[2]
     end
+    file.rewind # for possible future use of file outside this object
 
   end
 
   private
 
-  def evaluate_nil?(element, nil_return, else_return)
+  def execute_if_nil?(element, nil_return, else_return)
     element.nil? ? nil_return : else_return
   end
 
   # Ensures IDs are not nil.
-  def verify_results(result, to_return=result)
-    evaluate_nil? result, ['0'], to_return
+  #
+  #see #execute_if_nil?
+  def verify_ID_results(result, to_return=result)
+    execute_if_nil? result, ['0'], to_return
   end
 
 end
