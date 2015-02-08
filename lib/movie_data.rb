@@ -3,8 +3,6 @@
 # COSI 105B
 # (PA) Movies Part 2
 
-require 'set'
-
 require_relative 'data_storage'
 require_relative 'movie_test'
 
@@ -40,11 +38,8 @@ class MovieData
   end
 
   # Find specific movie rating. If user did not rate movie, returns 0.
-  def rating(user_id, movie_id)
-
-    all_ratings = get_all_ratings movie_id
-    all_ratings.nil? ? 0.0 : all_ratings[user_id].to_i
-
+  def rating(user_id, movie_id, set=:training)
+    execute_from_set set, proc { @training_data.rating(user_id, movie_id) }, proc { @test_data.rating(user_id, movie_id) }
   end
 
   # Get all movies reviewed by a certain user in either training or test data.
@@ -161,10 +156,7 @@ class MovieData
 
     ratings_from_sample = sample_ratings movie_id, user_sample
 
-    sum_of_ratings = 0.0
-    ratings_from_sample.each { |rating| sum_of_ratings += rating }
-
-    sum_of_ratings / ratings_from_sample.size
+    calc_prediction ratings_from_sample
 
   end
 
@@ -178,11 +170,11 @@ class MovieData
     lines_to_test.each do |line|
       # [0] := user_id, [1] := movie_id, [2] := rating, [3] := timestamp
       line = line.chomp.split
-      user_id, movie_id = line[0], line[1]
+      user_id, movie_id, rating = line[0], line[1], line[2]
 
       results.push({ :user_id => user_id,
                      :movie_id => movie_id,
-                     :rating => rating(user_id, movie_id),
+                     :rating => rating.to_i,
                      :prediction => predict(user_id, movie_id)
                    })
     end
@@ -233,16 +225,16 @@ class MovieData
 
   end
 
-  # Returns a Set of ratings for a certain movie from a list of users.
+  # Returns an array of ratings for a certain movie from a list of users.
   #
   #see #relevent_ratings
   def sample_ratings(movie_id, user_pool)
 
     relevant_ratings = relevant_ratings movie_id, user_pool
-    ratings_from_sample = Set.new
+    ratings_from_sample = []
 
     user_pool.each do |user|
-      ratings_from_sample.add relevant_ratings[user]
+      ratings_from_sample.push relevant_ratings[user]
     end
 
     ratings_from_sample
@@ -263,15 +255,25 @@ class MovieData
   end
 
   # Returns a segment of the most similar users.
-  # Segment is currently defined as top 30% of similar users.
+  # Segment is currently defined as top 70% of similar users, as this was found to be more accurate than a smaller proportion.
   def grab_top_similar_users(user_id)
 
     similar_array = most_similar user_id
 
     similar_users = []
-    similar_array.first(similar_array.size * 0.30).each { |_, user| similar_users.push user }
+    similar_array.first(similar_array.size * 0.70).each { |_, user| similar_users.push user }
 
     similar_users
+
+  end
+
+  def calc_prediction(ratings_from_sample)
+
+    best_estimate = {0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0 }
+    ratings_from_sample.each { |rating| best_estimate[rating] += 1 }
+
+    # Returns key corresponding to the largest value
+    best_estimate.max_by { |_, val| val }[0].to_f
 
   end
 

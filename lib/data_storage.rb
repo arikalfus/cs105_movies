@@ -27,7 +27,12 @@ class DataStorage
   # Returned as Hash of hashes from user id => rating
   def get_all_ratings(movie_id)
     ratings = @movie_ratings_map[movie_id]
-    execute_if_nil? ratings, Hash.new, ratings
+    ratings.nil? ? Hash.new : ratings
+  end
+
+  def rating(user_id, movie_id)
+    all_ratings = get_all_ratings movie_id
+    all_ratings.empty? ? 0.0 : all_ratings[user_id].to_i
   end
 
   # Returned as array of movie IDs

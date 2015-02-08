@@ -30,7 +30,7 @@ class MovieTest
   def rms
     total = @errors.inject { |acc, er| acc + er**2 }
 
-    total.to_f / @errors.size
+    Math.sqrt total.to_f / @errors.size
 
   end
 

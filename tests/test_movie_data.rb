@@ -35,7 +35,7 @@ class TestMovie < Test::Unit::TestCase
 		user2 = users[rand users.size]
 
 		sim = movie_data.similarity user1, user2
-		assert_not_equal 0, sim, 'Similarity is 0! This does happen occasionally. Please rerun the rake test.'
+		assert_not_equal 0.0, sim, 'Similarity is 0! This does happen occasionally. Please rerun the rake test.'
 	end
 
 	# def test_total_sim
@@ -85,7 +85,7 @@ class TestMovie < Test::Unit::TestCase
                                :test => :u1)
 
     movie_data.load_data
-    movie_test = movie_data.run_test 20
+    movie_test = movie_data.run_test 50
     puts "Movie Test results: #{movie_test.to_a}"
     puts "Statistics:\n#{movie_test.compute_stats}"
 
