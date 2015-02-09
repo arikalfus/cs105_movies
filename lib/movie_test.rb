@@ -1,5 +1,5 @@
-# author: Ari Kalfus
-# email: akalfus@brandeis.edu
+# Author:: Ari Kalfus
+# Email:: akalfus@brandeis.edu
 # COSI 105B
 # (PA) Movies Part 2
 
